@@ -1,19 +1,15 @@
 const projectsData = [
   {
-    title: 'A Search Engine',
-    description: `What if you could look up any information in the world? Webpages, images, videos
-    and more. Google has many features to help you find exactly what you're looking
-    for.`,
-    imgSrc: '/static/images/google.png',
-    href: 'https://www.google.com',
+    title: 'SICF20 EXHIBITION Wacoal Study Hall Kyoto Encouragement Award',
+    description: `「韻を踏む」という作品の共同製作者として、ワコールスタディホール京都奨励賞を受賞しました。`,
+    imgSrc: '/static/images/wacole.png',
+    href: 'https://www.sicf.jp/archives/archives20/winnerslist/',
   },
   {
-    title: 'The Time Machine',
-    description: `Imagine being able to travel back in time or to the future. Simple turn the knob
-    to the desired date and press "Go". No more worrying about lost keys or
-    forgotten headphones with this simple yet affordable solution.`,
-    imgSrc: '/static/images/time-machine.jpg',
-    href: '/blog/the-time-machine',
+    title: 'Bunch: iOS App',
+    description: `メモアプリ(iOS)をReact Nativeで開発しました。`,
+    imgSrc: '/static/images/bunch.png',
+    href: 'https://www.sicf.jp/archives/archives20/winnerslist/',
   },
 ]
 
