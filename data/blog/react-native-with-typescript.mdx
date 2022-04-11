@@ -1,0 +1,250 @@
+---
+title: 'React Navigation × TypeScriptでハマった'
+date: 2022-04-12T2:11:16Z
+lastmod: '2022-04-12'
+tags: ['react-native', 'typescript', 'development']
+draft: false
+layout: PostSimple
+bibliography: references-data.bib
+---
+
+## 導入
+
+個人開発で React-Native を書いています。
+React Navigation を TypeScript と一緒に使ってて色々ハマったので、備忘録をまとめておきます。
+
+ハマるたびに更新しておこうと思います。
+
+基本は、
+
+- kmgk さんの[React Navigation を Typescript と一緒に使う際につまづいたところ](https://blog.kmgk.site/post/react-navigation-troubles-with-typescript/)
+- 公式ドキュメントの[Type checking with TypeScript](https://reactnavigation.org/docs/typescript/)
+  を参考に実装を行なっています。
+
+## 前提
+
+- expo-cli を用いて、アプリを作成しています。
+
+## ベースの実装
+
+まず、HomeScreen と MemoDeatilScreen という二つの画面を用意します。
+
+`App.tsx`
+
+```ts
+import { StatusBar } from 'expo-status-bar'
+import { StyleSheet, Text, View } from 'react-native'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { NavigationContainer } from '@react-navigation/native'
+import {
+  NativeBaseProvider,
+  Avatar,
+  HStack,
+  Center,
+  ScrollView,
+  Heading,
+  Button,
+} from 'native-base'
+import HomeScreen from './src/screens/HomeScreen'
+import MemoDetailScreen from './src/screens/MemoDetailScreen'
+
+// 遷移先登録のための初期化処理
+const Stack = createNativeStackNavigator()
+
+const RootStack = () => {
+  return (
+    <Stack.Navigator initialRouteName="Home">
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="MemoDetail" component={MemoDetailScreen} />
+    </Stack.Navigator>
+  )
+}
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <RootStack />
+    </NavigationContainer>
+  )
+}
+```
+
+`HomeScreen.tsx`
+
+```ts
+import { useNavigation } from '@react-navigation/native';
+import { StyleSheet, Text, View } from 'react-native';
+import {
+  NativeBaseProvider,
+  Button
+} from "native-base";
+
+const styles = StyleSheet.create({
+  container: {
+    ...
+  },
+});
+
+const HomeScreen = () => {
+  const navigation = useNavigation()
+
+  return (
+    <NativeBaseProvider>
+      <View style={styles.container}>
+        <Button
+          size="full"
+          onPress={() => navigation.navigate('MemoDetailScreen')}
+        />
+      </View>
+    </NativeBaseProvider>
+  );
+}
+
+export default HomeScreen;
+```
+
+`MemoDetailScreen.tsx`
+
+```ts
+import { NativeBaseProvider, Heading } from 'native-base'
+
+export default function MemoDetailScreen() {
+  return (
+    <NativeBaseProvider>
+      <Heading fontSize="xl">MemoDetailScreen</Heading>
+    </NativeBaseProvider>
+  )
+}
+```
+
+### ハマりポイント
+
+この状態だと、`navigate('MemoDetailScreen')`でエラーが出ます。
+
+```
+navigation.navigate('MemoDetailScreen')
+```
+
+`エラー本文`
+
+```
+型 'string' の引数を型 '{ key: string; params?: undefined; merge?: boolean | undefined; } | { name: never; key?: string | undefined; params: never; merge?: boolean | undefined; }' のパラメーターに割り当てることはできません。ts(2345)
+```
+
+ここで、公式ドキュメントを読んでいきましょう。
+
+> To type check our route name and params, the first thing we need to do is to create an object type with mappings for route name to the params of the route. For example, say we have a route called Profile in our root navigator which should have a param userId:
+
+まず、Route の名前と渡すパラメータをマッピングするオブジェクトを作りましょうとの書いてあります。
+
+作成したオブジェクトがこちらです。
+
+```ts
+type RootStackParamList = {
+  Home: undefined
+  MemoDetail: undefined
+}
+```
+
+特に渡すパラメータも決めてないので、パラメータ側は undefined で定義してやります。
+
+> Specifying undefined means that the route doesn't have params.
+
+と公式にも書いてありますね。
+
+その次にやるべきことがこちら。
+
+> After we have defined the mappings, we need to tell our navigator to use it. To do that, we can pass it as a generic to the createXNavigator functions:
+
+マッピング定義したんやから、Navigator にそれを使うようにしてね。
+createNavigator の function の Genereic の型に、先ほど定義した`RootStackParamList`を指定してあげます。
+
+これで Navigator と Screeen Component のプロパティにタイプチェックがかかります。
+
+```ts
+<Stack.Screen name="hoge" component={HomeScreen} />
+```
+
+のように指定すると、
+`型 '"hoge"' を型 'keyof RootStackParamList' に割り当てることはできません。ts(2322`のエラーが表示されます。
+Home もしくは、MemoDetail しか指定できなくなるようになりました！
+
+ただ、これでは、まだ先ほどから出ている
+`エラー`は治りません。
+
+```
+型 'string' の引数を型 '{ key: string; params?: undefined; merge?: boolean | undefined; } | { name: never; key?: string | undefined; params: never; merge?: boolean | undefined; }' のパラメーターに割り当てることはできません。ts(2345)
+```
+
+それでは、公式ドキュメントの次の手順に進みましょう。
+
+> To type check our screens, we need to annotate the navigation prop and the route prop received by a screen. The navigator packages in React Navigation export a generic types to define types for both the navigation and route props from the corresponding navigator.
+
+タイプチェックするために、スクリーンから受け取るナビゲーションとルートのプロパティにアノテーションをつける必要があります。
+
+React Navigation のナビゲータのパッケージは、ジェネリックのタイプを対応するナビゲータで定義されるナビゲーションとルートのプロパティの型に export します。
+
+....
+
+？？。
+
+ひとまず、公式ドキュメントにコード例があるので、それを眺めていきましょう。
+
+> For example, you can use NativeStackScreenProps for the Native Stack Navigator.
+
+`公式ドキュメントで紹介されているコード`
+
+```ts
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
+
+type RootStackParamList = {
+  Home: undefined
+  Profile: { userId: string }
+  Feed: { sort: 'latest' | 'top' } | undefined
+}
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Profile'>
+```
+
+例えば、Native Stack Navigator の型として、NativeStackScreenProps を使用できるとあります。
+この Type は 3 つのジェネリクスを持ちます。
+
+> ・The param list object we defined earlier
+
+> ・The name of the route the screen belongs to
+
+> ・The ID of the navigator (optional)
+
+一つ目は、先ほど定義したパラメターの一覧のオブジェクト（RootStackParamList）
+二つ目は、そのスクリーンが、属しているルートの名前
+最後の Id を指定したい場合は、このように書きます。
+
+```ts
+type Props = NativeStackScreenProps<RootStackParamList, 'Profile', 'MyStack'>
+```
+
+こう書くことで、`navigate`なりを使って、画面遷移させるときの、Route の名前と、パラメータの型チェックができます。
+
+また、useNavigation の定義元にコードジャンプをすると、
+
+````ts
+export default function useNavigation<T = NavigationProp<ReactNavigation.RootParamList>>(): T;
+``
+useNavigationにジェネリクスを渡せそうです。
+今回、`createNativeStackNavigator`を使って、StackNavigatorを作成したので、
+
+```ts
+const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Home'>>()
+````
+
+と定義してあげます。
+
+こうすることで、エラーは消え、問題が解決しました。
+
+無事、画面遷移することができましたー。めでたしめでたし。
+
+### 一旦、まとめ
+
+kmgk さんの記事にもあるように、やはり公式ドキュメントを読み込もうってところに尽きる。
+TypeScript がまだ手に馴染んでないので、こうやってドキュメントに書きながら実装することで、
+慣れていきたい。
