@@ -1,7 +1,7 @@
 ---
 title: サーバーサイドの勉強. ~まずはLinuxの基礎の基礎
 date: '2022-04-17'
-tags: ['tech', 'linux', 'server-side']
+tags: ['tech', 'development', 'linux', 'server-side']
 draft: false
 summary: モバイルアプリエンジニア0xwataがサーバーサイドのスキルを深めたいと思い、勉強を始めた。まずはサーバーOSの知識をつけるのが一番との記事を拝見したので、サーバーOSの一つのLinuxを深堀りするところから始めてみた
 ---

@@ -1,7 +1,7 @@
 ---
 title: サーバーサイドの勉強開始 ~導入~
 date: '2022-04-16'
-tags: ['tech', 'linux', 'server-side']
+tags: ['tech', 'development', 'linux', 'server-side']
 draft: false
 summary: モバイルアプリエンジニア0xwataがサーバーサイドのスキルを深めたいと思い、勉強を始めた。まずはサーバーOSの知識をつけるのが一番との記事を拝見したので、サーバーOSの一つのLinuxを深堀りするところから始めてみた
 ---
@@ -28,7 +28,7 @@ summary: モバイルアプリエンジニア0xwataがサーバーサイドの�
 
 まずは、どのように勉強をしていけばいいかを調べる必要がある。
 今回は、[サーバーエンジニアになりたい人におすすめの勉強方法、順番【未経験者・初心者向け】
-(]https://infla-lab.com/blog/server-engineer-study/)を参考に勉強をしていくこととする。
+](https://infla-lab.com/blog/server-engineer-study/)を参考に勉強をしていくこととする。
 
 ## おすすめの勉強法
 
