@@ -1,9 +1,9 @@
+---
 title: サーバーサイドの勉強. ~CentOS, Debian の深堀
 date: '2022-04-22'
 tags: ['tech', 'development', 'linux', 'server-side']
 draft: false
 summary: モバイルアプリエンジニア 0xwata がサーバーサイドのスキルを深めたいと思い、勉強を始めた。まずはサーバー OS の知識をつけるのが一番との記事を拝見したので、サーバー OS の一つの Linux を深堀りするところから始めてみた
-
 ---
 
 ## 導入
