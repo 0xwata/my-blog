@@ -1,6 +1,7 @@
 ---
 name: Wataru Takamine
-avatar: /static/images/avatar_virtual.png
+avatar1: /static/images/avatar_virtual.png
+avatar2: /static/images/avatar_virtual2.png
 occupation: Software Engineer
 company: DMM.com now
 email: 0xwata@gmail.com

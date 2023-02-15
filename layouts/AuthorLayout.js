@@ -3,8 +3,23 @@ import Image from '@/components/Image'
 import { PageSEO } from '@/components/SEO'
 
 export default function AuthorLayout({ children, frontMatter }) {
-  const { name, avatar, occupation, company, email, twitter, linkedin, github, instagram } =
-    frontMatter
+  const {
+    name,
+    avatar1,
+    avatar2,
+    occupation,
+    company,
+    email,
+    twitter,
+    linkedin,
+    github,
+    instagram,
+  } = frontMatter
+
+  var avatar = avatar1
+  if (Math.random() < 0.5) {
+    avatar = avatar2
+  }
 
   return (
     <>
